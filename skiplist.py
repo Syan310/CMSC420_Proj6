@@ -132,7 +132,7 @@ class SkipList():
     # Append the value associated to the given key to this list.
     def search(self, key: int) -> str:
         current = self.headnode
-        visited_keys = []
+        visited_keys = [-float('inf')]  # Include -Infinity at the start
 
         for i in range(self.maxlevel, -1, -1):
             while current.pointers[i] and current.pointers[i].key < key:
@@ -142,6 +142,6 @@ class SkipList():
         current = current.pointers[0]
         if current and current.key == key:
             visited_keys.append(current.key)
-            return json.dumps({"visited_keys": visited_keys, "value": current.value}, indent=2)
+            return json.dumps(visited_keys + [current.value], indent=2)
         else:
-            return json.dumps({"visited_keys": visited_keys, "value": None}, indent=2)
+            return json.dumps(visited_keys + [None], indent=2)
