@@ -139,8 +139,7 @@ class SkipList():
             while current.pointers[i] and current.pointers[i].key <= key:
                 if current.pointers[i].key == key:
                     visited_keys.append(current.pointers[i].key)
-                    return json.dumps(visited_keys, indent=2)
+                    return json.dumps(visited_keys + [current.pointers[0].value], indent=2)
                 else:
-                    
                     current = current.pointers[i]
                     visited_keys.append(current.key)  # Record each node visited
