@@ -136,12 +136,16 @@ class SkipList():
 
         for i in range(self.maxlevel, -1, -1):
             while current.pointers[i] and current.pointers[i].key < key:
-                visited_keys.append(current.pointers[i].key)
+                # Move right in the current level
                 current = current.pointers[i]
+            # Add the key of the last node at this level to visited_keys if it's different from the last one
+            if visited_keys[-1] != current.key:
+                visited_keys.append(current.key)
 
+        # Move to the next level, which might be the target node
         current = current.pointers[0]
+
         if current and current.key == key:
-            visited_keys.append(current.key)
             return json.dumps(visited_keys + [current.value], indent=2)
         else:
             return json.dumps(visited_keys + [None], indent=2)
