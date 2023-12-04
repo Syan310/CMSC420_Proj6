@@ -1,7 +1,6 @@
 from __future__ import annotations
 import json
 from typing import List
-import random
 
 verbose = False
 
@@ -88,15 +87,9 @@ class SkipList():
         self.tailnode = tailnode
         self.maxlevel = maxlevel
 
-    def random_level(self, max_level):
-        level = 0
-        while random.randint(0, 1) and level < max_level:
-            level += 1
-        return level
-
     # Create and insert a node with the given key, value, and toplevel.
     # The key is guaranteed to not be in the skiplist.
-    def insert(self, key, value, toplevel):
+    def insert(self, key: int, value: str, toplevel: int):
         update = [None] * (self.maxlevel + 1)
         current = self.headnode
 
@@ -110,20 +103,15 @@ class SkipList():
         current = current.pointers[0]
 
         if current is None or current.key != key:
-            random_level = self.random_level(self.maxlevel)
-            if random_level > toplevel:
-                random_level = toplevel
-
-            new_node = Node(key, value, random_level)
-            for i in range(random_level + 1):
+            new_node = Node(key, value, toplevel, [None]*(toplevel+1))
+            for i in range(toplevel + 1):
                 new_node.pointers[i] = update[i].pointers[i]
                 update[i].pointers[i] = new_node
-
     
 
     # Delete node with the given key.
     # The key is guaranteed to be in the skiplist.
-    def delete(self, key):
+    def delete(self, key: int):
         update = [None] * (self.maxlevel + 1)
         current = self.headnode
 
@@ -142,7 +130,7 @@ class SkipList():
     # Search for the given key.
     # Construct a list of all the keys in all the nodes visited during the search.
     # Append the value associated to the given key to this list.
-    def search(self, key):
+    def search(self, key: int) -> str:
         current = self.headnode
         visited_keys = []
 
