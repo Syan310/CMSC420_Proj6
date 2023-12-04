@@ -135,20 +135,17 @@ class SkipList():
         current = self.headnode
         visited_keys = [-float('inf')]  # Include -Infinity at the start
 
+        # Traverse from top level to the bottom level
         for i in range(self.maxlevel, -1, -1):
+            # Move right until you can't go further without passing the key
             while current.pointers[i] and current.pointers[i].key < key:
-                # Move right in the current level until the next node's key is greater or equal to the search key
                 current = current.pointers[i]
 
-            # Add the key of the last node at this level to visited_keys
-            # Only if it's different from the last one and we're about to go down a level
-            if i > 0 and (not current.pointers[i] or current.pointers[i].key != key):
+            # Record the key when moving down a level or if on the bottom level
+            if i == 0 or current.pointers[i] and current.pointers[i].key != key:
                 visited_keys.append(current.key)
 
-        # Add the target key to visited_keys if it's found
-        if current.pointers[0] and current.pointers[0].key == key:
-            visited_keys.append(key)
-            return json.dumps(visited_keys + [current.pointers[0].value], indent=2)
-        else:
-            # If the key is guaranteed to be in the list, this else branch could be omitted.
-            return json.dumps(visited_keys + [None], indent=2)
+        # Append the searched key and its value, as we are now at the bottom level and have found the key
+        visited_keys.append(key)
+        return json.dumps(visited_keys + [current.pointers[0].value], indent=2)
+
