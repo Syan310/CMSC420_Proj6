@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 import json
 from typing import List
@@ -130,25 +131,18 @@ class SkipList():
     # Search for the given key.
     # Construct a list of all the keys in all the nodes visited during the search.
     # Append the value associated to the given key to this list.
-    def search(self, key) -> str:
-        current = self.header
-        visited_keys = [-float('inf')]  # Starting with the header node represented by -Infinity
+    def search(self, key: int) -> str:
+        current = self.headnode
+        visited_keys = [-float('inf')]  # Include -Infinity at the start
 
-        # Traverse from the top level
-        for level in range(self.max_level, -1, -1):
-            # Traverse horizontally
-            while current.forward[level] and current.forward[level].key < key:
-                # Record the key of each traversed node
-                visited_keys.append(current.forward[level].key)
-                current = current.forward[level]
+        for i in range(self.maxlevel, -1, -1):
+            while current.pointers[i] and current.pointers[i].key < key:
+                current = current.pointers[i]
+                visited_keys.append(current.key)  # Record each node visited
 
-            # If the next node is the target, break the loop to prevent duplication
-            if current.forward[level] and current.forward[level].key == key:
-                break
-
-        # Check if the target node is found
-        if current.forward[0] and current.forward[0].key == key:
-            visited_keys.append(key)
-            return json.dumps(visited_keys + [current.forward[0].value])
+        # Check if the next node is the target
+        if current.pointers[0] and current.pointers[0].key == key:
+            visited_keys.append(current.pointers[0].key)  # Include the searched key
+            return json.dumps(visited_keys + [current.pointers[0].value], indent=2)
         else:
-            return json.dumps(visited_keys + [None])
+            return json.dumps(visited_keys + [None], indent=2)
