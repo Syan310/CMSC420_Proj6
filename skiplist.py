@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 import json
 from typing import List
@@ -131,21 +130,23 @@ class SkipList():
     # Search for the given key.
     # Construct a list of all the keys in all the nodes visited during the search.
     # Append the value associated to the given key to this list.
-    def search(self, key: int) -> str:
-        current = self.headnode
-        visited_keys = [-float('inf')]  # Include -Infinity at the start
+    def search(self, key) -> str:
+            current = self.header
+            visited_keys = [-float('inf')]  # Starting with the header node represented by -Infinity
 
-        # Traverse from top level to the bottom level
-        for i in range(self.maxlevel, -1, -1):
-            # Move right until you can't go further without passing the key
-            while current.pointers[i] and current.pointers[i].key < key:
-                current = current.pointers[i]
+            # Traverse from the top level
+            for level in range(self.max_level, -1, -1):
+                # Traverse horizontally
+                while current.forward[level] and current.forward[level].key < key:
+                    # Record the key of each traversed node
+                    if current.forward[level].key not in visited_keys:
+                        visited_keys.append(current.forward[level].key)
+                    current = current.forward[level]
 
-            # Record the key when moving down a level or if on the bottom level
-            if i == 0 or current.pointers[i] and current.pointers[i].key != key:
-                visited_keys.append(current.key)
+                # Record the target node if found
+                if current.forward[level] and current.forward[level].key == key:
+                    visited_keys.append(key)
+                    return json.dumps(visited_keys + [current.forward[level].value])
 
-        # Append the searched key and its value, as we are now at the bottom level and have found the key
-        visited_keys.append(key)
-        return json.dumps(visited_keys + [current.pointers[0].value], indent=2)
-
+            # Return the list of traversed nodes with None if the target is not found
+            return json.dumps(visited_keys + [None])
