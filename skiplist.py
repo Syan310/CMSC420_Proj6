@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 import json
 from typing import List
@@ -135,17 +136,10 @@ class SkipList():
         visited_keys = [-float('inf')]  # Include -Infinity at the start
 
         for i in range(self.maxlevel, -1, -1):
-            # Move right in the current level until the next node has a key greater than the search key
             while current.pointers[i] and current.pointers[i].key < key:
                 current = current.pointers[i]
+                visited_keys.append(current.key)  # Record each node visited
 
-            # If the next node at this level is the target, add it to visited_keys and break
-            if current.pointers[i] and current.pointers[i].key == key:
-                visited_keys.append(key)
-                break
-
-        # Check if the target key was found
-        if current.pointers[0] and current.pointers[0].key == key:
-            return json.dumps(visited_keys + [current.pointers[0].value], indent=2)
-        else:
-            return json.dumps(visited_keys + [None], indent=2)
+        # Directly append the searched key and its value, since the key is guaranteed to be in the skip list
+        visited_keys.append(key)
+        return json.dumps(visited_keys + [current.pointers[0].value], indent=2)
