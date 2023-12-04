@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 from typing import List
+import random
 
 verbose = False
 
@@ -87,19 +88,72 @@ class SkipList():
         self.tailnode = tailnode
         self.maxlevel = maxlevel
 
+    def random_level(self, max_level):
+        level = 0
+        while random.randint(0, 1) and level < max_level:
+            level += 1
+        return level
+
     # Create and insert a node with the given key, value, and toplevel.
     # The key is guaranteed to not be in the skiplist.
-    def insert(self,key,value,toplevel):
-        print('Placeholder')
+    def insert(self, key, value, toplevel):
+        update = [None] * (self.maxlevel + 1)
+        current = self.headnode
+
+        # Start from the highest level of the skip list
+        for i in range(self.maxlevel, -1, -1):
+            while current.pointers[i] and current.pointers[i].key < key:
+                current = current.pointers[i]
+            update[i] = current
+
+        # Reached level 0 and forward pointer to right, which is desired position to insert key.
+        current = current.pointers[0]
+
+        if current is None or current.key != key:
+            random_level = self.random_level(self.maxlevel)
+            if random_level > toplevel:
+                random_level = toplevel
+
+            new_node = Node(key, value, random_level)
+            for i in range(random_level + 1):
+                new_node.pointers[i] = update[i].pointers[i]
+                update[i].pointers[i] = new_node
+
+    
 
     # Delete node with the given key.
     # The key is guaranteed to be in the skiplist.
-    def delete(self,key):
-        print('Placeholder')
+    def delete(self, key):
+        update = [None] * (self.maxlevel + 1)
+        current = self.headnode
+
+        for i in range(self.maxlevel, -1, -1):
+            while current.pointers[i] and current.pointers[i].key < key:
+                current = current.pointers[i]
+            update[i] = current
+
+        current = current.pointers[0]
+        if current and current.key == key:
+            for i in range(current.toplevel + 1):
+                if update[i].pointers[i] != current:
+                    break
+                update[i].pointers[i] = current.pointers[i]
 
     # Search for the given key.
     # Construct a list of all the keys in all the nodes visited during the search.
     # Append the value associated to the given key to this list.
-    def search(self,key) -> str:
-        A = ['your list gets constructed here']
-        return json.dumps(A,indent = 2)
+    def search(self, key):
+        current = self.headnode
+        visited_keys = []
+
+        for i in range(self.maxlevel, -1, -1):
+            while current.pointers[i] and current.pointers[i].key < key:
+                visited_keys.append(current.pointers[i].key)
+                current = current.pointers[i]
+
+        current = current.pointers[0]
+        if current and current.key == key:
+            visited_keys.append(current.key)
+            return json.dumps({"visited_keys": visited_keys, "value": current.value}, indent=2)
+        else:
+            return json.dumps({"visited_keys": visited_keys, "value": None}, indent=2)
