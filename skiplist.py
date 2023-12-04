@@ -131,22 +131,24 @@ class SkipList():
     # Construct a list of all the keys in all the nodes visited during the search.
     # Append the value associated to the given key to this list.
     def search(self, key) -> str:
-            current = self.header
-            visited_keys = [-float('inf')]  # Starting with the header node represented by -Infinity
+        current = self.header
+        visited_keys = [-float('inf')]  # Starting with the header node represented by -Infinity
 
-            # Traverse from the top level
-            for level in range(self.max_level, -1, -1):
-                # Traverse horizontally
-                while current.forward[level] and current.forward[level].key < key:
-                    # Record the key of each traversed node
-                    if current.forward[level].key not in visited_keys:
-                        visited_keys.append(current.forward[level].key)
-                    current = current.forward[level]
+        # Traverse from the top level
+        for level in range(self.max_level, -1, -1):
+            # Traverse horizontally
+            while current.forward[level] and current.forward[level].key < key:
+                # Record the key of each traversed node
+                visited_keys.append(current.forward[level].key)
+                current = current.forward[level]
 
-                # Record the target node if found
-                if current.forward[level] and current.forward[level].key == key:
-                    visited_keys.append(key)
-                    return json.dumps(visited_keys + [current.forward[level].value])
+            # If the next node is the target, break the loop to prevent duplication
+            if current.forward[level] and current.forward[level].key == key:
+                break
 
-            # Return the list of traversed nodes with None if the target is not found
+        # Check if the target node is found
+        if current.forward[0] and current.forward[0].key == key:
+            visited_keys.append(key)
+            return json.dumps(visited_keys + [current.forward[0].value])
+        else:
             return json.dumps(visited_keys + [None])
