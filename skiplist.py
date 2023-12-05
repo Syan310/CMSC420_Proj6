@@ -133,7 +133,7 @@ class SkipList():
     # Append the value associated to the given key to this list.
     def search(self, key: int) -> str:
         current = self.headnode
-        visited_keys = [-float('inf')]  # Include -Infinity at the start
+        visited_keys = []
 
         for i in range(self.maxlevel, -1, -1):
             while current.pointers[i] and current.pointers[i].key <= key:
